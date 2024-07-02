@@ -38,7 +38,7 @@ app.get('/api/hello', async (req, res) => {
             return res.json({ message: 'Could not determine your location. Please try again.' });
         }
 
-        const weatherResponse = await axios.get(`http://api.weatherapi.com/v1/current.json?key=${process.env.WEATHER_API_KEY}&q=${city}`);
+        const weatherResponse = await axios.get(`http://api.weatherapi.com/v1/current.json?key=f4c7820e3f824011ba2204706240107&q=${city}`);
         const temperature = weatherResponse.data.current.temp_c;
 
         res.json({
