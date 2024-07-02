@@ -27,6 +27,7 @@ app.get('/api/hello', async (req, res) => {
 
         const { city, ip } = geoResponse;
         if (!city) {
+            console.log(geoResponse);
             return res.json({ message: 'Could not determine your location. Please try again.' });
         }
 
