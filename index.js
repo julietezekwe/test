@@ -20,7 +20,12 @@ app.get('/api/hello', async (req, res) => {
     }
 
     // Extract the client's IP address from the request
-    const clientIp = req.ip;
+    // const clientIp = req.ip;
+    const clientIp = req.headers['x-forwarded-for'] || req.ip;
+    console.log({
+        h: req.headers,
+        ip: req.ip
+    });
 
     try {
         const geoResponse = await getGeoLocation(clientIp);
