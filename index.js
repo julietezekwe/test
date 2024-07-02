@@ -1,27 +1,17 @@
 const express = require('express');
 const app = express();
 const axios = require('axios');
-require('dotenv').config(); 
+require('dotenv').config();
 
-async function getPublicIp() {
+async function getGeoLocation(ip) {
     try {
-      const response = await axios.get('https://api.ipify.org?format=json');
-      return response.data.ip;
+        const response = await axios.get(`https://ipapi.co/${ip}/json/`);
+        return response.data;
     } catch (error) {
-      console.error('Error fetching public IP:', error);
-      return null;
+        console.error('Error fetching geolocation data:', error);
+        return null;
     }
-  }
-
-  async function getGeoLocation(ip) {
-    try {
-      const response = await axios.get(`https://ipapi.co/${ip}/json/`);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching geolocation data:', error);
-      return null;
-    }
-  }
+}
 
 app.get('/api/hello', async (req, res) => {
     const visitorName = req.query.visitor_name;
@@ -29,16 +19,18 @@ app.get('/api/hello', async (req, res) => {
         return res.json({ message: 'Please input your name.' });
     }
 
+    // Extract the client's IP address from the request
+    const clientIp = req.ip;
+
     try {
-        const publicIp = await getPublicIp();
-        const geoResponse = await getGeoLocation(publicIp);
+        const geoResponse = await getGeoLocation(clientIp);
 
         const { city, ip } = geoResponse;
         if (!city) {
             return res.json({ message: 'Could not determine your location. Please try again.' });
         }
 
-        const weatherResponse = await axios.get(`http://api.weatherapi.com/v1/current.json?key=f4c7820e3f824011ba2204706240107&q=${city}`);
+        const weatherResponse = await axios.get(`http://api.weatherapi.com/v1/current.json?key=${process.env.WEATHER_API_KEY}&q=${city}`);
         const temperature = weatherResponse.data.current.temp_c;
 
         res.json({
